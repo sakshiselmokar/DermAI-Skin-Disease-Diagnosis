@@ -50,19 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCwkqHG7uQMVH9HCG71iAyNzoAvKQOsBMc',
-    appId: '1:9961103992:android:2513a22c6d6a807128038d',
-    messagingSenderId: '9961103992',
-    projectId: 'cuticare-485af',
-    storageBucket: 'cuticare-485af.appspot.com',
+    apiKey: 'AIzaSyAkw2IlagW96CRJ_8lmHrI8tMrlgyF5U20',
+    appId: '1:146545034456:android:0f806671310944fbd203ad',
+    messagingSenderId: '146545034456',
+    projectId: 'dermai-b5963',
+    storageBucket: 'dermai-b5963.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDMg6_7bMEnl1z73mTThEmggN68--hGyzg',
-    appId: '1:9961103992:ios:967f02f30e6995fa28038d',
-    messagingSenderId: '9961103992',
-    projectId: 'cuticare-485af',
-    storageBucket: 'cuticare-485af.appspot.com',
+    apiKey: 'AIzaSyA5pII-IX9oD_rVn5SRvK3c_MBL1SCSMPE',
+    appId: '1:146545034456:ios:bf53eb5f4fac8376d203ad',
+    messagingSenderId: '146545034456',
+    projectId: 'dermai-b5963',
+    storageBucket: 'dermai-b5963.firebasestorage.app',
+    androidClientId: '146545034456-t6fptjgh6lf6j6rkt63d6nqilihpl9l9.apps.googleusercontent.com',
+    iosClientId: '146545034456-ec3l27jsgvahsarthrp947n0qmceitbn.apps.googleusercontent.com',
     iosBundleId: 'com.example.demoCuticare',
   );
 }

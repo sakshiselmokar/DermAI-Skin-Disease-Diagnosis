@@ -1,4 +1,4 @@
-import 'package:demo_cuticare/model/cart_item.dart';
+import 'package:dermai/model/cart_item.dart';
 
 List<CartItem> products = [
   CartItem(

@@ -1,4 +1,4 @@
-package com.example.demo_cuticare
+package com.example.dermai
 
 import io.flutter.embedding.android.FlutterActivity
 

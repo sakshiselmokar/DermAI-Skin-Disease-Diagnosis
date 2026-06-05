@@ -1,25 +1,32 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'main_pages/bottom_nav_bar.dart';
-import 'main_pages/home.dart';
+import 'package:dermai/main_pages/bottom_nav_bar.dart';
+import 'package:flutter/material.dart';
 
+/// Onboarding carousel.
+///
+/// [onDone] — optional callback fired when the user taps Skip.
+/// When omitted, the screen pushes directly to [BottomNavBar] (legacy behaviour).
 class DemoPage extends StatelessWidget {
+  final VoidCallback? onDone;
+
+  const DemoPage({Key? key, this.onDone}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'DermAI',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-      ),
-      home: GettingStartedScreen(),
+      theme: ThemeData(primarySwatch: Colors.red),
+      home: GettingStartedScreen(onDone: onDone),
     );
   }
 }
 
 class GettingStartedScreen extends StatefulWidget {
-  const GettingStartedScreen({Key? key}) : super(key: key);
+  final VoidCallback? onDone;
+
+  const GettingStartedScreen({Key? key, this.onDone}) : super(key: key);
 
   @override
   _GettingStartedScreenState createState() => _GettingStartedScreenState();
@@ -28,20 +35,16 @@ class GettingStartedScreen extends StatefulWidget {
 class _GettingStartedScreenState extends State<GettingStartedScreen> {
   int _currentPage = 0;
   final PageController _pageController = PageController(initialPage: 0);
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    Timer.periodic(Duration(seconds: 5), (Timer timer) {
-      if (_currentPage < 2) {
-        _currentPage++;
-      } else {
-        _currentPage = 0;
-      }
-
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      final next = (_currentPage + 1) % slideList.length;
       _pageController.animateToPage(
-        _currentPage,
-        duration: Duration(milliseconds: 300),
+        next,
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeIn,
       );
     });
@@ -49,14 +52,20 @@ class _GettingStartedScreenState extends State<GettingStartedScreen> {
 
   @override
   void dispose() {
-    super.dispose();
+    _timer?.cancel();
     _pageController.dispose();
+    super.dispose();
   }
 
-  void _onPageChanged(int index) {
-    setState(() {
-      _currentPage = index;
-    });
+  void _skip(BuildContext context) {
+    if (widget.onDone != null) {
+      widget.onDone!();
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const BottomNavBar()),
+      );
+    }
   }
 
   @override
@@ -73,82 +82,52 @@ class _GettingStartedScreenState extends State<GettingStartedScreen> {
                   alignment: AlignmentDirectional.bottomCenter,
                   children: <Widget>[
                     PageView.builder(
-                      scrollDirection: Axis.horizontal,
                       controller: _pageController,
-                      onPageChanged: _onPageChanged,
+                      onPageChanged: (i) =>
+                          setState(() => _currentPage = i),
                       itemCount: slideList.length,
                       itemBuilder: (ctx, i) => SlideItem(i),
                     ),
-                    Stack(
-                      alignment: AlignmentDirectional.topStart,
-                      children: <Widget>[
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 20),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              for (int i = 0; i < slideList.length; i++)
-                                if (i == _currentPage)
-                                  SlideDots(true)
-                                else
-                                  SlideDots(false)
-                            ],
-                          ),
-                        ),
-                      ],
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 20),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          for (int i = 0; i < slideList.length; i++)
+                            SlideDots(i == _currentPage),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(
-                height: 20,
-                width: 50,
-              ),
+              const SizedBox(height: 20),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   ElevatedButton(
-                    child: Text(
-                      'Skip',
-                      style: TextStyle(fontSize: 20),
-                    ),
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                          borderRadius: BorderRadius.circular(10)),
                       padding: const EdgeInsets.all(10),
                       backgroundColor: Theme.of(context).primaryColor,
                       foregroundColor: Colors.white,
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => BottomNavBar()),
-                      );
-                    },
+                    onPressed: () => _skip(context),
+                    child: const Text('Skip', style: TextStyle(fontSize: 20)),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text(
-                        'Back',
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
+                      const Text('Back', style: TextStyle(fontSize: 20)),
                       TextButton(
-                        child: Text(
-                          'Next',
-                          style: TextStyle(fontSize: 20),
+                        child: const Text('Next',
+                            style: TextStyle(fontSize: 20)),
+                        onPressed: () => _pageController.nextPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeIn,
                         ),
-                        onPressed: () {
-                          _pageController.nextPage(
-                            duration: Duration(milliseconds: 300),
-                            curve: Curves.easeIn,
-                          );
-                        },
                       ),
                     ],
                   ),
@@ -164,38 +143,30 @@ class _GettingStartedScreenState extends State<GettingStartedScreen> {
 
 class SlideItem extends StatelessWidget {
   final int index;
-  SlideItem(this.index);
+  const SlideItem(this.index, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Container(
           width: 200,
           height: 200,
           decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
             image: DecorationImage(
               image: AssetImage(slideList[index].imageUrl),
               fit: BoxFit.cover,
             ),
           ),
         ),
-        SizedBox(
-          height: 80,
-        ),
+        const SizedBox(height: 80),
         Text(
           slideList[index].title,
           style: TextStyle(
-            fontSize: 20,
-            color: Theme.of(context).primaryColor,
-          ),
+              fontSize: 20, color: Theme.of(context).primaryColor),
         ),
-        SizedBox(
-          height: 10,
-        ),
+        const SizedBox(height: 10),
         Text(
           slideList[index].description,
           textAlign: TextAlign.center,
@@ -237,12 +208,12 @@ final slideList = [
 
 class SlideDots extends StatelessWidget {
   final bool isActive;
-  SlideDots(this.isActive);
+  const SlideDots(this.isActive, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: Duration(milliseconds: 150),
+      duration: const Duration(milliseconds: 150),
       margin: const EdgeInsets.symmetric(horizontal: 10),
       height: isActive ? 12 : 8,
       width: isActive ? 12 : 8,

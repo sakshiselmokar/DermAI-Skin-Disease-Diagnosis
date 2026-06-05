@@ -1,5 +1,5 @@
-import 'package:demo_cuticare/resources.dart';
-import 'package:demo_cuticare/sign_in.dart';
+import 'package:dermai/resources.dart';
+import 'package:dermai/sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:demo_cuticare/resources.dart';
-import 'package:demo_cuticare/sign_up_model/user_model.dart';
+import 'package:dermai/resources.dart';
+import 'package:dermai/sign_up_model/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';

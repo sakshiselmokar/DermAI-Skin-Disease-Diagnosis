@@ -1,26 +1,73 @@
 {
   "project_info": {
-    "project_number": "9961103992",
-    "project_id": "cuticare-485af",
-    "storage_bucket": "cuticare-485af.appspot.com"
+    "project_number": "146545034456",
+    "project_id": "dermai-b5963",
+    "storage_bucket": "dermai-b5963.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:9961103992:android:2513a22c6d6a807128038d",
+        "mobilesdk_app_id": "1:146545034456:android:3db89d882e4f82f9d203ad",
         "android_client_info": {
-          "package_name": "com.example.demo_cuticare"
+          "package_name": "com.dermai.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "146545034456-t6fptjgh6lf6j6rkt63d6nqilihpl9l9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dermai.app",
+            "certificate_hash": "aa367229d6f348e967aaa1d1631b5dbe4100a3bf"
+          }
+        },
+        {
+          "client_id": "146545034456-ng3u6v6mpvhht7om3vbbupfumpare2ac.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyCwkqHG7uQMVH9HCG71iAyNzoAvKQOsBMc"
+          "current_key": "AIzaSyAkw2IlagW96CRJ_8lmHrI8tMrlgyF5U20"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "146545034456-ng3u6v6mpvhht7om3vbbupfumpare2ac.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:146545034456:android:0f806671310944fbd203ad",
+        "android_client_info": {
+          "package_name": "com.example.dermai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "146545034456-ng3u6v6mpvhht7om3vbbupfumpare2ac.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkw2IlagW96CRJ_8lmHrI8tMrlgyF5U20"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "146545034456-ng3u6v6mpvhht7om3vbbupfumpare2ac.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
