@@ -3,6 +3,7 @@ import 'package:dermai/main_pages/skincare_screen.dart';
 import 'package:dermai/main_pages/home_remedies_screen.dart';
 import 'package:dermai/main_pages/profile.dart';
 import 'package:dermai/resources.dart';
+import 'package:dermai/screens/deep_link.dart';
 import 'package:flutter/material.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -15,19 +16,38 @@ class BottomNavBar extends StatefulWidget {
 class _BottomNavBarState extends State<BottomNavBar> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = const [
-    HomeScreen(),
-    SkincareScreen(),
-    HomeRemediesScreen(),
-    Profile(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Register the switchTo callback so ResultScreen can trigger tab changes
+    BottomNavController.switchTo = (int index) {
+      if (mounted) setState(() => _currentIndex = index);
+    };
+  }
+
+  @override
+  void dispose() {
+    BottomNavController.switchTo = null;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Pass deep-link disease into skincare/remedies when switching tabs
+    final skincareDisease = _currentIndex == 1 ? DeepLink.disease : null;
+    final remediesDisease = _currentIndex == 2 ? DeepLink.disease : null;
+
+    final pages = [
+      const HomeScreen(),
+      SkincareScreen(initialDisease: skincareDisease),
+      HomeRemediesScreen(initialDisease: remediesDisease),
+      const Profile(),
+    ];
+
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: _pages,
+        children: pages,
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -42,15 +62,16 @@ class _BottomNavBarState extends State<BottomNavBar> {
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
-          onTap: (i) => setState(() => _currentIndex = i),
+          onTap: (i) {
+            // Clear deep link when user manually taps a tab
+            if (i != 1 && i != 2) DeepLink.disease = null;
+            setState(() => _currentIndex = i);
+          },
           backgroundColor: Colors.transparent,
           elevation: 0,
           selectedItemColor: c,
           unselectedItemColor: Colors.grey.shade400,
-          selectedLabelStyle: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-          ),
+          selectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
           unselectedLabelStyle: const TextStyle(fontSize: 11),
           type: BottomNavigationBarType.fixed,
           items: const [
