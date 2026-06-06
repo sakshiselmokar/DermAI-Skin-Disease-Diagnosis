@@ -21,3 +21,4 @@ ios/Runner/GeneratedPluginRegistrant.m
 # Firebase
 firebase.json
 .firebaserc
+.env

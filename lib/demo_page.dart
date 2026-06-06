@@ -1,15 +1,10 @@
 import 'dart:async';
-
 import 'package:dermai/main_pages/bottom_nav_bar.dart';
+import 'package:dermai/resources.dart';
 import 'package:flutter/material.dart';
 
-/// Onboarding carousel.
-///
-/// [onDone] — optional callback fired when the user taps Skip.
-/// When omitted, the screen pushes directly to [BottomNavBar] (legacy behaviour).
 class DemoPage extends StatelessWidget {
   final VoidCallback? onDone;
-
   const DemoPage({Key? key, this.onDone}) : super(key: key);
 
   @override
@@ -17,7 +12,7 @@ class DemoPage extends StatelessWidget {
     return MaterialApp(
       title: 'DermAI',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.red),
+      theme: ThemeData(primarySwatch: Colors.green),
       home: GettingStartedScreen(onDone: onDone),
     );
   }
@@ -25,28 +20,24 @@ class DemoPage extends StatelessWidget {
 
 class GettingStartedScreen extends StatefulWidget {
   final VoidCallback? onDone;
-
   const GettingStartedScreen({Key? key, this.onDone}) : super(key: key);
 
   @override
-  _GettingStartedScreenState createState() => _GettingStartedScreenState();
+  State<GettingStartedScreen> createState() => _GettingStartedScreenState();
 }
 
 class _GettingStartedScreenState extends State<GettingStartedScreen> {
   int _currentPage = 0;
-  final PageController _pageController = PageController(initialPage: 0);
+  final PageController _pageController = PageController();
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      final next = (_currentPage + 1) % slideList.length;
-      _pageController.animateToPage(
-        next,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeIn,
-      );
+    _timer = Timer.periodic(const Duration(seconds: 4), (_) {
+      final next = (_currentPage + 1) % _slides.length;
+      _pageController.animateToPage(next,
+          duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
     });
   }
 
@@ -57,169 +48,194 @@ class _GettingStartedScreenState extends State<GettingStartedScreen> {
     super.dispose();
   }
 
-  void _skip(BuildContext context) {
+  void _finish(BuildContext context) {
     if (widget.onDone != null) {
       widget.onDone!();
     } else {
       Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const BottomNavBar()),
-      );
+          context, MaterialPageRoute(builder: (_) => const BottomNavBar()));
     }
   }
+
+  static const _slides = [
+    _Slide(
+      emoji: '🔬',
+      title: 'AI Skin Diagnosis',
+      description:
+          'Upload a photo of any skin condition and DermAI\'s machine learning model identifies it in seconds — powered by a ResNet-50 model trained on thousands of dermatology images.',
+      color: Color(0xFFF0FFF6),
+      accent: c,
+    ),
+    _Slide(
+      emoji: '🌿',
+      title: 'Natural Remedies & Skincare',
+      description:
+          'Get personalised skincare routines, home remedies using kitchen ingredients, and disease-specific tips — all tailored to your diagnosis.',
+      color: Color(0xFFF0FFF6),
+      accent: c,
+    ),
+    _Slide(
+      emoji: '📍',
+      title: 'Find Nearby Dermatologists',
+      description:
+          'Locate certified skin specialists near you on Google Maps. DermAI is a screening tool — always follow up with a professional for treatment.',
+      color: Color(0xFFF0FFF6),
+      accent: c,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(50.0),
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: Stack(
-                  alignment: AlignmentDirectional.bottomCenter,
-                  children: <Widget>[
-                    PageView.builder(
-                      controller: _pageController,
-                      onPageChanged: (i) =>
-                          setState(() => _currentPage = i),
-                      itemCount: slideList.length,
-                      itemBuilder: (ctx, i) => SlideItem(i),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          for (int i = 0; i < slideList.length; i++)
-                            SlideDots(i == _currentPage),
-                        ],
-                      ),
-                    ),
-                  ],
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(children: [
+          // Logo header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+            child: Row(children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: c.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                child: const Icon(Icons.biotech_rounded, color: c, size: 24),
+              ),
+              const SizedBox(width: 10),
+              const Text('DermAI',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87)),
+            ]),
+          ),
+
+          // PageView
+          Expanded(
+            child: Stack(alignment: AlignmentDirectional.bottomCenter, children: [
+              PageView.builder(
+                controller: _pageController,
+                onPageChanged: (i) => setState(() => _currentPage = i),
+                itemCount: _slides.length,
+                itemBuilder: (_, i) => _SlideItem(slide: _slides[i]),
+              ),
+              // Dots
+              Positioned(
+                bottom: 16,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(_slides.length, (i) => _Dot(active: i == _currentPage)),
                 ),
               ),
-              const SizedBox(height: 20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      padding: const EdgeInsets.all(10),
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: () => _skip(context),
-                    child: const Text('Skip', style: TextStyle(fontSize: 20)),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      const Text('Back', style: TextStyle(fontSize: 20)),
-                      TextButton(
-                        child: const Text('Next',
-                            style: TextStyle(fontSize: 20)),
-                        onPressed: () => _pageController.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeIn,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
+            ]),
           ),
-        ),
+
+          // Buttons
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+            child: Column(children: [
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: c,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    elevation: 0,
+                  ),
+                  onPressed: () => _finish(context),
+                  child: Text(
+                    _currentPage == _slides.length - 1 ? 'Get Started' : 'Skip',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                TextButton(
+                  onPressed: _currentPage > 0
+                      ? () => _pageController.previousPage(
+                          duration: const Duration(milliseconds: 300), curve: Curves.easeIn)
+                      : null,
+                  child: Text('Back',
+                      style: TextStyle(
+                          fontSize: 15,
+                          color: _currentPage > 0 ? Colors.black54 : Colors.transparent)),
+                ),
+                TextButton(
+                  onPressed: _currentPage < _slides.length - 1
+                      ? () => _pageController.nextPage(
+                          duration: const Duration(milliseconds: 300), curve: Curves.easeIn)
+                      : () => _finish(context),
+                  child: Text(
+                    _currentPage < _slides.length - 1 ? 'Next →' : 'Start',
+                    style: const TextStyle(fontSize: 15, color: c, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ]),
+            ]),
+          ),
+        ]),
       ),
     );
   }
 }
 
-class SlideItem extends StatelessWidget {
-  final int index;
-  const SlideItem(this.index, {Key? key}) : super(key: key);
+class _Slide {
+  final String emoji;
+  final String title;
+  final String description;
+  final Color color;
+  final Color accent;
+  const _Slide({
+    required this.emoji, required this.title,
+    required this.description, required this.color, required this.accent,
+  });
+}
+
+class _SlideItem extends StatelessWidget {
+  final _Slide slide;
+  const _SlideItem({required this.slide});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(32, 24, 32, 60),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        // Emoji illustration
         Container(
-          width: 200,
-          height: 200,
+          width: 160,
+          height: 160,
           decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(slideList[index].imageUrl),
-              fit: BoxFit.cover,
-            ),
+            color: slide.color,
+            shape: BoxShape.circle,
+            border: Border.all(color: slide.accent.withOpacity(0.2), width: 2),
           ),
+          child: Center(child: Text(slide.emoji, style: const TextStyle(fontSize: 72))),
         ),
-        const SizedBox(height: 80),
-        Text(
-          slideList[index].title,
-          style: TextStyle(
-              fontSize: 20, color: Theme.of(context).primaryColor),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          slideList[index].description,
-          textAlign: TextAlign.center,
-        ),
-      ],
+        const SizedBox(height: 40),
+        Text(slide.title,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: slide.accent)),
+        const SizedBox(height: 16),
+        Text(slide.description,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 14, color: Colors.black45, height: 1.7)),
+      ]),
     );
   }
 }
 
-class Slide {
-  final String imageUrl;
-  final String title;
-  final String description;
-
-  Slide({
-    required this.imageUrl,
-    required this.title,
-    required this.description,
-  });
-}
-
-final slideList = [
-  Slide(
-    imageUrl: 'assets/002.png',
-    title: 'Step 1',
-    description: 'Open the camera on your device to capture!',
-  ),
-  Slide(
-    imageUrl: 'assets/001.png',
-    title: 'Step 2',
-    description: 'Focus the camera precisely on the patch.',
-  ),
-  Slide(
-    imageUrl: 'assets/003.png',
-    title: 'Step 3',
-    description: 'Upload the image.',
-  ),
-];
-
-class SlideDots extends StatelessWidget {
-  final bool isActive;
-  const SlideDots(this.isActive, {Key? key}) : super(key: key);
+class _Dot extends StatelessWidget {
+  final bool active;
+  const _Dot({required this.active});
 
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 150),
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      height: isActive ? 12 : 8,
-      width: isActive ? 12 : 8,
+      duration: const Duration(milliseconds: 200),
+      margin: const EdgeInsets.symmetric(horizontal: 5),
+      height: active ? 10 : 7,
+      width: active ? 24 : 7,
       decoration: BoxDecoration(
-        color: isActive ? Theme.of(context).primaryColor : Colors.grey,
-        borderRadius: BorderRadius.all(Radius.circular(12)),
+        color: active ? c : Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(10),
       ),
     );
   }
