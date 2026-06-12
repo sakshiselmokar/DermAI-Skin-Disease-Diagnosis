@@ -64,6 +64,6 @@ class DefaultFirebaseOptions {
     storageBucket: 'dermai-b5963.firebasestorage.app',
     androidClientId: '146545034456-t6fptjgh6lf6j6rkt63d6nqilihpl9l9.apps.googleusercontent.com',
     iosClientId: '146545034456-ec3l27jsgvahsarthrp947n0qmceitbn.apps.googleusercontent.com',
-    iosBundleId: 'com.example.demoCuticare',
+    iosBundleId: 'com.example.demodermaicare',
   );
 }
